@@ -4,13 +4,16 @@
       <h1 class="title">
         VP Reports UI
       </h1>
-      <div class="row">
+      <div class="row" v-if="auth">
         <div class="align-center col-xs-12">
           <b-btn v-if="!refreshing" variant="outline-success" @click="refreshPrograms()">Refresh Programs</b-btn>
           <b-btn v-else :disabled="true" variant="outline-success">Refreshing Programs</b-btn>
         </div>
       </div>
-      <nuxt-link to="/about">About</nuxt-link>
+      <b-button variant="outline-primary" v-if="auth" @click="$router.push('/member')">Dashboard</b-button>
+      <b-button variant="outline-warning" @click="$router.push('/about')">About</b-button>
+      <b-button variant="outline-primary" v-if="!auth" @click="$router.push('/login')">Login</b-button>
+      <b-button variant="outline-danger" v-if="auth" @click="setAuth(null)">Logout</b-button>
     </div>
 
   </section>
@@ -20,6 +23,7 @@
 
   import axios from 'axios';
   import Vue from 'vue';
+  import {mapState, mapActions} from 'vuex'
 
 export default {
   data(){
@@ -27,7 +31,11 @@ export default {
       refreshing: false
     }
   },
+  computed:{
+    ...mapState(['auth'])
+  },
   methods:{
+    ...mapActions(['setAuth']),
     refreshPrograms(){
       this.refreshing = true;
       axios.get('http://localhost:8080/api/report')
