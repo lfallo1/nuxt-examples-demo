@@ -13,7 +13,7 @@
       <b-button variant="outline-primary" v-if="auth" @click="$router.push('/member')">Dashboard</b-button>
       <b-button variant="outline-warning" @click="$router.push('/about')">About</b-button>
       <b-button variant="outline-primary" v-if="!auth" @click="$router.push('/login')">Login</b-button>
-      <b-button variant="outline-danger" v-if="auth" @click="setAuth(null)">Logout</b-button>
+      <b-button variant="outline-danger" v-if="auth" @click="logout">Logout</b-button>
     </div>
 
   </section>
@@ -35,7 +35,7 @@ export default {
     ...mapState(['auth'])
   },
   methods:{
-    ...mapActions(['setAuth']),
+    ...mapActions(['setAuth', 'logout']),
     refreshPrograms(){
       this.refreshing = true;
       axios.get('http://localhost:8080/api/report')

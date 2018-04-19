@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <h3 class="title">Dashboard ({{auth.username}})</h3>
+    <h3 class="title">Dashboard ({{auth.user_details.username}})</h3>
     <nuxt-link to="/">Home</nuxt-link>
   </section>
 </template>
