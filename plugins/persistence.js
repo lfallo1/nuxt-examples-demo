@@ -2,14 +2,6 @@ import createPersistedState from 'vuex-persistedstate'
 import * as Cookies from 'js-cookie'
 import cookie from 'cookie'
 
-/* when spa mode defined in nuxt.config.js => { src: '~/plugins/persistence.js', ssr: false}, */
-// export default ({store}) => {
-//   createPersistedState({
-//     paths: ['auth'],
-//     storage: sessionStorage
-//   })(store)
-// }
-
 /* universal */
 export default ({store, req, isDev}) => {
   createPersistedState({
@@ -21,3 +13,13 @@ export default ({store, req, isDev}) => {
     }
   })(store)
 }
+
+/* spa */
+//set this in nuxt.config.js under plugins => { src: '~/plugins/persistence.js', ssr: false},
+
+// export default ({store}) => {
+//   createPersistedState({
+//     paths: ['auth'],
+//     storage: sessionStorage
+//   })(store)
+// }
