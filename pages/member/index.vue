@@ -13,6 +13,7 @@
     computed: {
       ...mapState(['auth'])
     },
+    layout: 'memberLayout',
     middleware: ['auth']
   }
 </script>
