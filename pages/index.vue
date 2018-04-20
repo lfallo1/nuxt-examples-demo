@@ -23,7 +23,7 @@
 
   import axios from 'axios';
   import Vue from 'vue';
-  import {mapState, mapActions} from 'vuex'
+  import {mapState, mapActions, mapGetters} from 'vuex'
 
 export default {
   data(){
@@ -32,13 +32,14 @@ export default {
     }
   },
   computed:{
-    ...mapState(['auth'])
+    ...mapState(['auth']),
+    ...mapGetters(['accessToken'])
   },
   methods:{
     ...mapActions(['setAuth', 'logout']),
     refreshPrograms(){
       this.refreshing = true;
-      axios.get('http://localhost:8080/api/report')
+      axios.get('api/report/status', this.accessToken)
         .then(() =>{
           this.refreshing = false;
           Vue.toasted.success('Program Information Refreshed', {

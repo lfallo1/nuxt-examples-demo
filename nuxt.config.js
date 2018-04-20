@@ -35,6 +35,7 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    { src: '~/plugins/axios-config.js'},
     { src: '~/plugins/persistence.js'},
     { src: '~/plugins/vue-toasted.js', ssr: false },
     { src: '~/plugins/vue-material.js', ssr: false }

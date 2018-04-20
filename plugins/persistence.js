@@ -20,6 +20,6 @@ export default ({store, req, isDev}) => {
 // export default ({store}) => {
 //   createPersistedState({
 //     paths: ['auth'],
-//     storage: sessionStorage
+//     storage: localStorage
 //   })(store)
 // }

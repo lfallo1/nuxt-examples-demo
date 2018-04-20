@@ -7,6 +7,15 @@ export const state = () => ({
   loading: false
 })
 
+export const getters = {
+  basicAuthHeader(state){
+    return {headers: {Authorization: 'Basic dHJ1c3RlZGNsaWVudDpzZWNyZXQ='}}
+  },
+  accessToken(state) {
+    return state.auth && state.auth.access_token ? {headers: {Authorization: `Bearer ${state.auth.access_token}`}} : {};
+  }
+}
+
 export const mutations = {
   setAuth(state, auth) {
     state.auth = auth;
@@ -18,10 +27,10 @@ export const mutations = {
 
 export const actions = {
 
-  login({commit, error}, user) {
+  login({commit, error, getters}, user) {
     commit('setLoading', true);
     if (user.username && user.password) {
-      axios.post(`http://localhost:8080/oauth/token?username=${user.username}&password=${user.password}&grant_type=password&client_secret=secret&client_id=trustedclient`, null, {headers: {Authorization: 'Basic dHJ1c3RlZGNsaWVudDpzZWNyZXQ='}})
+      axios.post(`oauth/token?username=${user.username}&password=${user.password}&grant_type=password&client_secret=secret&client_id=trustedclient`, null, getters.basicAuthHeader)
         .then(response => {
           commit('setLoading', false);
           commit('setAuth', response.data);
@@ -39,9 +48,9 @@ export const actions = {
     Vue.toasted.error('Invalid username / password', {icon: 'warning', position: 'bottom-right'}).goAway(3500);
   },
 
-  logout({commit, state}) {
+  logout({commit, state, getters}) {
 
-    axios.post(`http://localhost:8080/logout`, null, {headers: {Authorization: `Bearer ${state.auth.access_token}`}})
+    axios.post(`logout`, null, getters.accessToken)
       .then(() => {
         commit('setAuth', null);
         Vue.toasted.info('You have been logged out', {icon: 'highlight_off', position: 'bottom-right'}).goAway(3500);
