@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import util from '~/assets/js/util.js'
 import axios from 'axios'
 
 export const state = () => ({
@@ -8,11 +7,14 @@ export const state = () => ({
 })
 
 export const getters = {
-  basicAuthHeader(state){
+  basicAuthHeader(state) {
     return {headers: {Authorization: 'Basic dHJ1c3RlZGNsaWVudDpzZWNyZXQ='}}
   },
   accessToken(state) {
-    return state.auth && state.auth.access_token ? {headers: {Authorization: `Bearer ${state.auth.access_token}`}} : {};
+    return state.auth && state.auth.access_token ? `Bearer ${state.auth.access_token}` : null;
+  },
+  refreshToken(state) {
+    return state.auth && state.auth.refresh_token ? state.auth.refresh_token : null;
   }
 }
 
@@ -40,7 +42,6 @@ export const actions = {
         .catch(err => {
           commit('setLoading', false);
           Vue.toasted.error('Invalid username / password', {icon: 'warning', position: 'bottom-right'}).goAway(3500);
-          window.$nuxt.error({statusCode: 500, message: 'BAD MOVE HORACE'}) //this.$nuxt.error inside components
         });
       return;
     }
@@ -48,19 +49,37 @@ export const actions = {
     Vue.toasted.error('Invalid username / password', {icon: 'warning', position: 'bottom-right'}).goAway(3500);
   },
 
-  logout({commit, state, getters}) {
+  logout({dispatch, getters}) {
 
-    axios.post(`logout`, null, getters.accessToken)
+    axios.post(`logout`)
       .then(() => {
-        commit('setAuth', null);
-        Vue.toasted.info('You have been logged out', {icon: 'highlight_off', position: 'bottom-right'}).goAway(3500);
-        this.app.router.push('/');
+        dispatch('clearAuth')
       })
       .catch(err => {
-        commit('setAuth', null);
-        Vue.toasted.info('You have been logged out', {icon: 'highlight_off', position: 'bottom-right'}).goAway(3500);
-        this.app.router.push('/');
+        dispatch('clearAuth')
       });
+  },
+
+  refreshToken({commit, getters}) {
+    return new Promise((resolve, reject) => {
+      axios.post(`oauth/token?grant_type=refresh_token&refresh_token=${getters.refreshToken}`, null, getters.basicAuthHeader)
+        .then(response => {
+          commit('setAuth', response.data);
+          resolve();
+        })
+        .catch(err => reject())
+    });
+  },
+
+  clearAuth({dispatch, state}) {
+    if (state.auth) {
+      dispatch('setAuth', null);
+      Vue.toasted.info('Your token has expired. Please log back in.', {
+        icon: 'highlight_off',
+        position: 'bottom-right'
+      }).goAway(3500);
+      this.app.router.push('/');
+    }
   },
 
   setAuth({commit}, auth) {
